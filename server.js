@@ -27,6 +27,10 @@ io.on("connection",(socket)=>{
 
         io.emit("update",activeUsers);
         socket.broadcast.emit("notify",data.userName+" has joined chats")
+        setTimeout(()=>{
+            io.emit("notify","");
+
+        },3000)
         
     })
     socket.on("send",(msg)=>{
@@ -39,6 +43,10 @@ io.on("connection",(socket)=>{
     socket.on("disconnect",()=>{
         activeUsers--;
         io.emit("notify",users[socket.id]+ " has left chats");
+        setTimeout(()=>{
+            io.emit("notify","");
+
+        },3000)
         
     })
 })
