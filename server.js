@@ -1,7 +1,7 @@
 const express=require('express')
 const app=express();
 const cors=require("cors")
-
+require("dotenv").config()
 const {createServer} =require("http");
 const myHttpServer=createServer(app);
 
@@ -12,12 +12,23 @@ const io=new Server(myHttpServer,{
         origin:"*"
     }
 })
+// app.use(cors())
 
 let users=[];
+let activeUsers=0;
 
 io.on("connection",(socket)=>{
     console.log(`user connected ${socket.id}`)
-    io.emit("notify","new user connected")
+    
+    socket.on("enter",(data)=>{
+        users[socket.id]=data.userName;
+        activeUsers++;
+        console.log(activeUsers);
+
+        io.emit("update",activeUsers);
+        socket.broadcast.emit("notify",data.userName+" has joined chats")
+        
+    })
     socket.on("send",(msg)=>{
         console.log(msg);
         io.emit("recieve",msg);
@@ -26,8 +37,8 @@ io.on("connection",(socket)=>{
 
   
     socket.on("disconnect",()=>{
-        console.log(users[socket.id] +" left the chat")
-        io.emit("notify","some user disconnected");
+        activeUsers--;
+        io.emit("notify",users[socket.id]+ " has left chats");
         
     })
 })
@@ -35,7 +46,8 @@ io.on("connection",(socket)=>{
 
 
 
-myHttpServer.listen(3000,()=>{
-    console.log("running at 3000")
+const port=process.env.PORT||500
+myHttpServer.listen(port,()=>{
+    console.log(`server running at port ${port}`)
 })
     
