@@ -12,6 +12,10 @@ const io=new Server(myHttpServer,{
         origin:"*"
     }
 })
+app.get("/",(req,res)=>{
+    res.send("backend active")
+    // console.log("backend working")
+})
 // app.use(cors())
 
 let users=[];
